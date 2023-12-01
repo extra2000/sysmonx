@@ -3,8 +3,8 @@
 // Copyright (c) 2012-2014 Barend Gehrels, Amsterdam, the Netherlands.
 // Copyright (c) 2017 Adam Wulkiewicz, Lodz, Poland.
 
-// This file was modified by Oracle on 2016-2019.
-// Modifications copyright (c) 2016-2019 Oracle and/or its affiliates.
+// This file was modified by Oracle on 2016-2018.
+// Modifications copyright (c) 2016-2018 Oracle and/or its affiliates.
 // Contributed and/or modified by Adam Wulkiewicz, on behalf of Oracle
 
 // Use, modification and distribution is subject to the Boost Software License,
@@ -175,8 +175,7 @@ struct buffered_piece_collection
 
     typedef typename geometry::rescale_policy_type
         <
-            typename geometry::point_type<Ring>::type,
-            typename IntersectionStrategy::cs_tag
+            typename geometry::point_type<Ring>::type
         >::type rescale_policy_type;
 
     typedef typename geometry::segment_ratio_type
@@ -484,25 +483,25 @@ struct buffered_piece_collection
         //                 intersection-point -> outgoing)
         //    for all (co-located) points still present in the map
 
-        for (iterator_type tit = boost::begin(m_turns);
-            tit != boost::end(m_turns);
-            ++tit)
+        for (iterator_type it = boost::begin(m_turns);
+            it != boost::end(m_turns);
+            ++it)
         {
             typename occupation_map_type::iterator mit =
-                        occupation_map.find(tit->get_robust_point());
+                        occupation_map.find(it->get_robust_point());
 
             if (mit != occupation_map.end())
             {
                 buffer_occupation_info& info = mit->second;
                 for (int i = 0; i < 2; i++)
                 {
-                    add_incoming_and_outgoing_angles(tit->get_robust_point(), *tit,
+                    add_incoming_and_outgoing_angles(it->get_robust_point(), *it,
                                 m_pieces,
-                                i, tit->operations[i].seg_id,
+                                i, it->operations[i].seg_id,
                                 info);
                 }
 
-                tit->count_on_multi++;
+                it->count_on_multi++;
             }
         }
 
@@ -526,10 +525,10 @@ struct buffered_piece_collection
 #endif
 
         // Get left turns from all clusters
-        for (typename occupation_map_type::iterator mit = occupation_map.begin();
-            mit != occupation_map.end(); ++mit)
+        for (typename occupation_map_type::iterator it = occupation_map.begin();
+            it != occupation_map.end(); ++it)
         {
-            mit->second.get_left_turns(mit->first, m_turns, m_side_strategy);
+            it->second.get_left_turns(it->first, m_turns, m_side_strategy);
         }
     }
 
@@ -1420,13 +1419,8 @@ struct buffered_piece_collection
     inline void enrich()
     {
         enrich_intersection_points<false, false, overlay_buffer>(m_turns,
-            m_clusters, offsetted_rings, offsetted_rings,
-            m_robust_policy,
-            m_intersection_strategy.template get_point_in_geometry_strategy
-                <
-                    buffered_ring<Ring>,
-                    buffered_ring<Ring>
-                >());
+                    m_clusters, offsetted_rings, offsetted_rings,
+                    m_robust_policy, m_side_strategy);
     }
 
     // Discards all rings which do have not-OK intersection points only.

@@ -1525,14 +1525,6 @@ master_test_suite()
     return *impl::s_frk_state().m_master_test_suite;
 }
 
-namespace impl {
-
-master_test_suite_name_setter::master_test_suite_name_setter(const_string name) {
-  assign_op( master_test_suite().p_name.value, name.trim( "\"" ), 0 );
-}
-
-}
-
 //____________________________________________________________________________//
 
 // ************************************************************************** //
